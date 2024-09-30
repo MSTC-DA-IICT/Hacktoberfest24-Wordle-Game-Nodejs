@@ -60,4 +60,7 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     $ npm run server
 ---  
 ## Mentors  
+- [Vashisht Purani](https://github.com/vashishtpurani)
+- [Brinda Sorathiya](https://github.com/Brinda-Sorathiya)
+- [Nidhi Dodiya](https://github.com/NidhiDodiya1014)
 - [Devang Vaghani](https://github.com/devangsvaghani)  
