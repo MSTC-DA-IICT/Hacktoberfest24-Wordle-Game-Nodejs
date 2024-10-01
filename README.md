@@ -1,5 +1,5 @@
 # Wordle-Game-Nodejs
-A Wordle game using Socket.io, a library in Node which makes it easier to establish socket connections.
+A Wordle game using Socket.io, a library in Node which makes it easier to establish socket connections. The repository has already the necessary libraries ie. express,cors,body-parser,momngoose fork the repo and run "`npm install`". Use of nodemon is recommended, add node_modules and .env file to gitignore before sending any pull requests.
 
 This project is a sincere attempt by MSTC, DA-IICT to encourage Open Source contribution. Make the best out of the ongoing Hacktoberfest 2024 by contributing to for-the-community projects. This project participates in Hacktoberest 2024 and all successful PRs made here will be counted among the at least 4 successful pull requests that you'd need to make in order to be eligible for the Hacktoberfest appreciation (plant a tree / get a tee).
 
