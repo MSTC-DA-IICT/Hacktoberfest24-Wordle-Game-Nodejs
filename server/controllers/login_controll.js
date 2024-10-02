@@ -132,6 +132,8 @@ exports.signUp = async (req,res)=>{
 
 exports.logIn = async (req,res)=>{
     try {
+        console.log("wow");
+
         const {email, password} = req.body;
         
 
@@ -142,6 +144,7 @@ exports.logIn = async (req,res)=>{
                 }
             });
         }
+        
 
         const user = await User.findOne({email: email});
         
@@ -155,10 +158,22 @@ exports.logIn = async (req,res)=>{
                 }
             });
         }
+        
+        const resUser = user.toObject();
+        delete resUser.password;
+        const accessToken = await user.accessToken();
 
-        res.status(200).json({
-            message: "User logged in successfully"
+        const options = {
+            httpOnly: true,
+            secure: true,
+          };
+
+        return res.status(200).cookie("accessToken",accessToken,options).json({
+            message: "User logged in successfully",
+            user : resUser,
+            access_token: accessToken,
         });
+
     } catch (error) {
         res.status(500).json({
             error: {
