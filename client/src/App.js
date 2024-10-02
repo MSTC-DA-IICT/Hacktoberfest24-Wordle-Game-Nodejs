@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
-// import UserList from './pages/UserList';
+import UserList from './pages/UserList';
 // import WordleGame from './pages/WordleGame';
 import Navbar from './components/Navbar';
 
