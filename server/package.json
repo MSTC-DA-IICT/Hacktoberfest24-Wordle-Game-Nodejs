@@ -16,6 +16,8 @@
     "express": "^4.21.0",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.0",
-    "nodemon": "^3.1.7"
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.7",
+    "otp-generator": "^4.0.1"
   }
 }
