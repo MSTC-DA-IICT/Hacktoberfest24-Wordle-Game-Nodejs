@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const otpGenerator = require('otp-generator');
 
 const Jwt = require('../utils/jwt.js');
+const EmailUtil = require('../utils/email-sender.js');
 
 // Models import
 const Otp = require('../models/otp.js');
@@ -41,6 +42,8 @@ exports.requestOtp = async (req, res) => {
         await newOtp.save();
 
         // console.log(`OTP for ${email}: ${otp}`);
+
+        await EmailUtil.sendEmail(email, "OTP Verification", EmailUtil.html(otp));
 
         res.status(201).json({
             message: "OTP sent successfully"
