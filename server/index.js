@@ -1,34 +1,62 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const dbConfig = require("./config/database_config");
+// Importing required modules
+const http = require('http');
+const express = require('express');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
-dotenv.config(); // Load environment variables
-
-// create an express app
 const app = express();
-app.use(express.json());
+const server = http.createServer(app);
+dotenv.config({path: './config/database_config.env'});
 
+app.use(morgan("dev"));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
-// connect to MongoDB
-mongoose.connect(dbConfig.mongoURI, dbConfig.options)
-  .then(() => {
-    console.log("MongoDB connected successfully");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection failed", err);
-  });
+// Connecting to the database
+mongoose.connect(process.env.DB_URI)
+    .then(() => {
+        console.log("Connected to the database");
+    })
+    .catch((error) => {
+        console.error("Error connecting to the database:", error);
+    });
 
-
-// define routes here
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
+// CORS middleware
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // * means all
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization'); // * means all
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET'); // * means all
+        return res.status(200).json({});
+    }
+    next();
 });
 
+// Routes
+const loginRoute = require('./routes/login_route.js');
+app.use('/login', loginRoute);
 
-const PORT = process.env.PORT || 5000;
-
-// start the server
-app.listen(PORT, () => {
-console.log(`Server is running on http://localhost:${PORT}`);
+// Error Handling
+app.use((req, res, next) => {
+    const error = new Error('Not Found');
+    error.status = 404;
+    next(error);
 });
+
+app.use((error, req, res, next) => {
+    res.status(error.status || 500);
+    res.json({
+        error: {
+            message: error.message
+        }
+    });
+});
+
+// Starting the server
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
