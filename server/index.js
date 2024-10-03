@@ -36,7 +36,10 @@ app.use((req, res, next) => {
 
 // Routes
 const loginRoute = require('./routes/login_route.js');
+const gameRoute = require('./routes/game_route.js');
+
 app.use('/login', loginRoute);
+app.use('/game', gameRoute);
 
 // Error Handling
 app.use((req, res, next) => {
