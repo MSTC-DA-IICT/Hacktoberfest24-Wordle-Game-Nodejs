@@ -121,8 +121,11 @@ exports.signup = async (req, res) => {
         });
         await newUser.save();
 
+        const token = Jwt.sign({email: email, username: username});
+
         res.status(201).json({
-            message: "User created successfully"
+            message: "User created successfully",
+            token: token
         });
     } catch (error) {
         res.status(500).json({
