@@ -2,9 +2,10 @@
 const mongoose = require('mongoose');
 const otpGenerator = require('otp-generator');
 
+const Jwt = require('../utils/jwt.js');
+
 // Models import
 const Otp = require('../models/otp.js');
-const e = require("express");
 const User = require('../models/login_model.js');
 
 // Request OTP
@@ -19,13 +20,17 @@ exports.requestOtp = async (req, res) => {
             });
         }
 
-        const existingOtp = await Otp.exists({email: email});
-        if (existingOtp) {
+        const existingOtp = await Otp.findOne({email: email});
+        if (existingOtp && (Date.now() - existingOtp.createdAt) < 60000) {
             return res.status(400).json({
                 error: {
                     message: "An OTP has already been sent to this email"
                 }
             });
+        }
+
+        if (existingOtp) {
+            await Otp.deleteMany({email: email});
         }
 
         const otp = otpGenerator.generate(6, {upperCase: false, specialChars: false});
@@ -85,35 +90,32 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
-// SignUp 
-
-exports.signUp = async (req,res)=>{
+// Signup
+exports.signup = async (req, res) => {
     try {
-        const {username, password, email} = req.body;
-
-        if(!username ||!password ||!email){
+        const {username, email, password} = req.body;
+        if (!username || !email || !password) {
             return res.status(400).json({
                 error: {
-                    message: "Username, password and email are required"
+                    message: "Username, Email and Password are required"
                 }
             });
         }
 
-        const existingUser = await User.findOne({email: email});
-        if(existingUser){
+        const existingUser = await User.exists(email, username);
+        if (existingUser) {
             return res.status(400).json({
                 error: {
-                    message: "Email already exists"
+                    message: "Email or Username is already taken"
                 }
             });
         }
 
         const newUser = new User({
-            username,
-            password,
-            email
+            username: username,
+            email: email,
+            password: password
         });
-
         await newUser.save();
 
         res.status(201).json({
@@ -122,65 +124,54 @@ exports.signUp = async (req,res)=>{
     } catch (error) {
         res.status(500).json({
             error: {
-                message: "Internal Server Error"
+                message: error.message
             }
         });
     }
-}
+};
 
 // Login
-
-exports.logIn = async (req,res)=>{
+exports.login = async (req, res) => {
     try {
-        console.log("wow");
-
         const {email, password} = req.body;
-        
-
-        if(!email ||!password){
+        if (!email || !password) {
             return res.status(400).json({
                 error: {
-                    message: "Email and password are required"
+                    message: "Email and Password are required"
                 }
             });
         }
-        
 
         const user = await User.findOne({email: email});
-        
-        const isPassCorrect = await user.isPasswordCorrect(password);
-        
-
-        if(!user ||!(isPassCorrect)){
-            return res.status(401).json({
+        if (!user) {
+            return res.status(400).json({
                 error: {
-                    message: "Invalid email or password"
+                    message: "Invalid Email or Password"
                 }
             });
         }
-        
-        const resUser = user.toObject();
-        delete resUser.password;
-        const accessToken = await user.accessToken();
 
-        const options = {
-            httpOnly: true,
-            secure: true,
-          };
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.status(400).json({
+                error: {
+                    message: "Password is incorrect"
+                }
+            });
+        }
 
-        return res.status(200).cookie("accessToken",accessToken,options).json({
-            message: "User logged in successfully",
-            user : resUser,
-            access_token: accessToken,
+        const token = Jwt.sign({email: email, username: user.username});
+
+        res.status(200).json({
+            message: "Login successful",
+            token: token
         });
 
     } catch (error) {
         res.status(500).json({
             error: {
-                message: "Internal Server Error"
+                message: error.message
             }
         });
     }
-}
-
-
+};

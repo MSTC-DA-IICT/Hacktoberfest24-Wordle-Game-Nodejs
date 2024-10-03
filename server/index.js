@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const server = http.createServer(app);
-dotenv.config({path: './config/database_config.env'});
+dotenv.config({path: './config/config.env'});
 
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({extended: false}));
