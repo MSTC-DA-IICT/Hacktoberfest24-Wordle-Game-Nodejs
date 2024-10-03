@@ -79,7 +79,7 @@ exports.verifyOtp = async (req, res) => {
             });
         }
 
-        await Otp.deleteOne({email: email, otp: otp});
+        // await Otp.deleteOne({email: email, otp: otp});
 
         res.status(200).json({
             message: "OTP verified successfully"
@@ -96,8 +96,8 @@ exports.verifyOtp = async (req, res) => {
 // Signup
 exports.signup = async (req, res) => {
     try {
-        const {username, email, password} = req.body;
-        if (!username || !email || !password) {
+        const {username, email, password, otp} = req.body;
+        if (!username || !email || !password || !otp) {
             return res.status(400).json({
                 error: {
                     message: "Username, Email and Password are required"
@@ -114,12 +114,23 @@ exports.signup = async (req, res) => {
             });
         }
 
+        const existingOtp = await Otp.exists(email, otp);
+        if (!existingOtp) {
+            return res.status(400).json({
+                error: {
+                    message: "Invalid OTP"
+                }
+            });
+        }
+
         const newUser = new User({
             username: username,
             email: email,
             password: password
         });
         await newUser.save();
+
+        await Otp.deleteOne({email: email});
 
         const token = Jwt.sign({email: email, username: username});
 

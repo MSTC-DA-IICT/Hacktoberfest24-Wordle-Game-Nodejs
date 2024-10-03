@@ -16,4 +16,9 @@ const otpSchema = new mongoose.Schema({
     }
 });
 
+otpSchema.statics.exists = async function(email, otp) {
+    const otpDoc = await this.findOne({email: email, otp: otp});
+    return !!otpDoc;
+}
+
 module.exports = mongoose.model('Otp', otpSchema);
