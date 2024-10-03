@@ -1,0 +1,31 @@
+name: Limit Issue Creation
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issue if not owner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_CREATOR=$(jq -r .issue.user.login "$GITHUB_EVENT_PATH")
+          REPO_OWNER=$(jq -r .repository.owner.login "$GITHUB_EVENT_PATH")
+          ISSUE_NUMBER=$(jq -r .issue.number "$GITHUB_EVENT_PATH")
+
+          if [ "$ISSUE_CREATOR" != "$REPO_OWNER" ]; then
+            curl -X PATCH \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE_NUMBER \
+              -d '{"state": "closed"}'
+
+            curl -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE_NUMBER/comments \
+              -d '{"body": "This issue was automatically closed because only the repository owner can create issues."}'
+          fi
