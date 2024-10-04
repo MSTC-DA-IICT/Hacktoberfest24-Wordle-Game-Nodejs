@@ -7,7 +7,6 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 import fs from 'node:fs';
-import random from 'random-item';
 const app = express();
 const server = http.createServer(app);
 dotenv.config({path: './config/config.env'});
