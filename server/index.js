@@ -36,13 +36,12 @@ app.use((req, res, next) => {
 app.get('/random',(req,res)=>{
     fs.readFile('sample.txt', 'utf8', (err, data) => { 
         if (err) {
-          console.error(err);
           return err;
         }
         else{
         const words=data.split(/\s+/);
-        const randomword=randomItem(words)
-        console.log(data);
+        const randomnum=Math.floor(Math.random()*words.length)
+        const randomword=words[randomnum]
         res.send(randomword)
     }
       });
