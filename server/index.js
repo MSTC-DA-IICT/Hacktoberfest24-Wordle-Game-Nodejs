@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-
+const wordRoute = require('./routes/word_route.js');
 const app = express();
 const server = http.createServer(app);
 dotenv.config({path: './config/config.env'});
@@ -38,6 +38,7 @@ app.use((req, res, next) => {
 // Routes
 const loginRoute = require('./routes/login_route.js');
 app.use('/login', loginRoute);
+app.use('/word', wordRoute);
 
 // Error Handling
 app.use((req, res, next) => {
@@ -55,25 +56,6 @@ app.use((error, req, res, next) => {
     });
 });
 
-//Select random word
-app.get('/random', (req, res) => {
-    
-    fs.readFile('words.txt', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading file:', err);
-        return;
-      }
-      
-      // Split file content into an array of words
-      const wordsArray = data.split('\n').map(word => word.trim()).filter(word => word.length > 0);
-      
-      // Randomly select a word from the array
-      const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
-      
-      // Send the random word as a response
-      res.send(randomWord);
-    });
-  });
 
 // Starting the server
 const PORT = process.env.PORT || 5000;
