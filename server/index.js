@@ -1,6 +1,5 @@
 // Importing required modules
 const http = require('http');
-import { generate, count } from "random-words";
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
