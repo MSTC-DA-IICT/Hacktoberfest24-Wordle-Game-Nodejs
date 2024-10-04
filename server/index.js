@@ -1,20 +1,19 @@
 // Importing required modules
 const http = require('http');
+import { generate, count } from "random-words";
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const fs = require('fs');
-
+import fs from 'node:fs';
+import random from 'random-item';
 const app = express();
 const server = http.createServer(app);
 dotenv.config({path: './config/config.env'});
-
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-
 // Connecting to the database
 mongoose.connect(process.env.DB_URI)
     .then(() => {
@@ -34,7 +33,21 @@ app.use((req, res, next) => {
     }
     next();
 });
-
+app.get('/random',(req,res)=>{
+    fs.readFile('sample.txt', 'utf8', (err, data) => { 
+        if (err) {
+          console.error(err);
+          return err;
+        }
+        else{
+        const words=data.split(/\s+/);
+        const randomword=randomItem(words)
+        console.log(data);
+        res.send(randomword)
+    }
+      });
+    
+})
 // Routes
 const loginRoute = require('./routes/login_route.js');
 app.use('/login', loginRoute);
@@ -54,26 +67,6 @@ app.use((error, req, res, next) => {
         }
     });
 });
-
-//Select random word
-app.get('/random', (req, res) => {
-    
-    fs.readFile('words.txt', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading file:', err);
-        return;
-      }
-      
-      // Split file content into an array of words
-      const wordsArray = data.split('\n').map(word => word.trim()).filter(word => word.length > 0);
-      
-      // Randomly select a word from the array
-      const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
-      
-      // Send the random word as a response
-      res.send(randomWord);
-    });
-  });
 
 // Starting the server
 const PORT = process.env.PORT || 5000;
