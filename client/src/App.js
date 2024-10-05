@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import UserList from './pages/UserList';
 // import WordleGame from './pages/WordleGame';
 import Navbar from './components/Navbar';
+import SocketPage from './pages/Socket';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Login />} />
           {/* <Route path="/users" element={<UserList />} /> */}
           {/* <Route path="/game" element={<WordleGame />} /> */}
+          <Route path="/socket" element={<SocketPage />} />
         </Routes>
       </div>
     </Router>
