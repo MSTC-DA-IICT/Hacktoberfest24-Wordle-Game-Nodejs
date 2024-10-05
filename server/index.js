@@ -16,26 +16,27 @@ app.use(bodyParser.json());
 
 // Connecting to the database
 mongoose.connect(process.env.DB_URI)
-    .then(() => {
-        console.log("Connected to the database");
+.then(() => {
+    console.log("Connected to the database");
     })
     .catch((error) => {
         console.error("Error connecting to the database:", error);
     });
-
-// CORS middleware
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // * means all
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization'); // * means all
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET'); // * means all
-        return res.status(200).json({});
-    }
-    next();
-});
-
+    
+    // CORS middleware
+    app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*'); // * means all
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization'); // * means all
+        if (req.method === 'OPTIONS') {
+            res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET'); // * means all
+            return res.status(200).json({});
+        }
+        next();
+    });
+    
 // Routes
 const loginRoute = require('./routes/login_route.js');
+const wordRoute = require('./routes/word_route.js');
 app.use('/login', loginRoute);
 app.use('/word', wordRoute);
 
