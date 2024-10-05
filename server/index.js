@@ -37,6 +37,7 @@ app.use((req, res, next) => {
 // Routes
 const loginRoute = require('./routes/login_route.js');
 app.use('/login', loginRoute);
+app.use('/word', wordRoute);
 
 // Error Handling
 app.use((req, res, next) => {
