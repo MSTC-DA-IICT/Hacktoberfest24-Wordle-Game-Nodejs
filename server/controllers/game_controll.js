@@ -1,5 +1,7 @@
 // Librairies import
 const wordleLib = require('../utils/wordleLib.js');
+const fs = require('fs');
+const path = require("path");
 
 // Models import
 const Word = require('../models/word.js');
@@ -32,6 +34,41 @@ exports.checkWord = async (req, res) => {
             result: result
         });
 
+    } catch (error) {
+        res.status(500).json({
+            error: {
+                message: error.message
+            }
+        });
+    }
+}
+
+// Select Random Word
+exports.selectWord = async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, '../../random_words.txt');
+        fs.readFile(filePath, 'utf8', async (err, data) => {
+            if (err) {
+                console.error(`Error reading file: ${err.message}`);
+                return res.status(500).json({ error: 'Failed to read words file' });
+            }
+
+            const words = data.split('\n').map(word => word.trim()).filter(word => word);
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+
+            await Word.deleteMany({ username: req.user.username });
+
+            const word = new Word({
+                username: req.user.username,
+                word: randomWord
+            });
+            await word.save();
+
+            return res.status(200).json({
+                message: "Word selected successfully",
+                word: randomWord
+            });
+        });
     } catch (error) {
         res.status(500).json({
             error: {
