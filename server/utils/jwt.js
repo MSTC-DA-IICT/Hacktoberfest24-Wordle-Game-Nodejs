@@ -10,8 +10,19 @@ class Jwt {
         return jwt.sign(payload, JWT_SECRET, {expiresIn: JWT_EXPIRY});
     }
 
-    static verify(token) {
-        return jwt.verify(token, JWT_SECRET);
+    static verify(req, res, next) {
+        try {
+            const token = req.headers.authorization;
+            req.user = jwt.verify(token, JWT_SECRET);
+
+            next();
+        } catch (error) {
+            return res.status(401).json({
+                error: {
+                    message: 'Invalid or expired token - Please login again'
+                }
+            });
+        }
     }
 }
 
