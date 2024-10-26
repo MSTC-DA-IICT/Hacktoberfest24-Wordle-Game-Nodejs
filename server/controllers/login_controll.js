@@ -78,10 +78,14 @@ exports.verifyOtp = async (req, res) => {
                 }
             });
         }
+        const user = await User.findOne({email: email});
+
+        const token = Jwt.sign({email: email, username: user.username});
 
         await Otp.deleteOne({email: email, otp: otp});
 
         res.status(200).json({
+            token ,
             message: "OTP verified successfully"
         });
     } catch (error) {
